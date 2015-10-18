@@ -38,6 +38,13 @@ class LinkCorrection:
     # subclasses need a check and insert function
     pass
 
+
+class ConvertNormalToEuler(LinkCorrection):
+    def check(self, origin, target):
+        return origin.dataType == "Vector" and origin.name == "Normal" and target.dataType == "Euler"
+    def insert(self, nodeTree, origin, target, dataOrigin):
+        insertLinkedNode(nodeTree, "an_DirectionToRotationNode", origin, target)
+
 class ConvertNumberToEuler(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType in ["Integer", "Float"] and target.dataType == "Euler"
@@ -238,6 +245,7 @@ def getSocketCenter(socket1, socket2):
     return (socket1.node.viewLocation + socket2.node.viewLocation) / 2
 
 linkCorrectors = [
+    ConvertNormalToEuler(),
     ConvertNumberToEuler(),
     ConvertVectorToEuler(),
     ConvertEulerToVector(),
