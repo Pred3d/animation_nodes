@@ -9,11 +9,12 @@ class RayCastBVHTreeNode(bpy.types.Node, AnimationNode):
         self.inputs.new("an_BVHTreeSocket", "BVHTree", "bvhTree")
         self.inputs.new("an_VectorSocket", "Ray Start", "start")
         self.inputs.new("an_VectorSocket", "Ray Direction", "direction")
+        self.inputs.new("an_FloatSocket", "Min Distance", "minDistance").value = 0.001
         self.outputs.new("an_VectorSocket", "Location", "location")
         self.outputs.new("an_VectorSocket", "Normal", "normal")
 
     def getExecutionCode(self):
-        yield "location, normal, _, _ = bvhTree.ray_cast(start, direction)"
+        yield "location, normal, _, _ = bvhTree.ray_cast(start + direction.normalized() * minDistance, direction)"
         yield "if location is None:"
         yield "    location = mathutils.Vector((0, 0, 0))"
         yield "    normal = mathutils.Vector((0, 0, 0))"
