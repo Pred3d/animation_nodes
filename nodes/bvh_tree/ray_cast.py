@@ -14,16 +14,19 @@ class RayCastBVHTreeNode(bpy.types.Node, AnimationNode):
         socket.value = 0.001
         socket.hide = True
         socket = self.inputs.new("an_FloatSocket", "Max Distance", "maxDistance")
-        socket.value = sys.float_info.max
+        socket.value = 1e6
         socket.hide = True
         self.outputs.new("an_VectorSocket", "Location", "location")
         self.outputs.new("an_VectorSocket", "Normal", "normal")
+        self.outputs.new("an_BooleanSocket", "Hit", "hit")
 
     def getExecutionCode(self):
-        yield "location, normal, _, _ = bvhTree.ray_cast(start + direction.normalized() * minDistance, direction, maxDistance)"
+        yield "location, normal, _, _ = bvhTree.ray_cast(start + direction.normalized() * minDistance, direction, maxDistance - minDistance)"
         yield "if location is None:"
         yield "    location = mathutils.Vector((0, 0, 0))"
         yield "    normal = mathutils.Vector((0, 0, 0))"
+        yield "    hit = False"
+        yield "else: hit = True"
 
     def getUsedModules(self):
         return ["mathutils"]
