@@ -1,7 +1,7 @@
 import bpy
 from . import tree_info
 from mathutils import Vector
-from . sockets.info import toBaseIdName
+from . sockets.info import toBaseIdName, isList
 from . tree_info import getAllDataLinks, getDirectlyLinkedSocket
 
 def correctForbiddenNodeLinks():
@@ -73,7 +73,7 @@ class ConvertEulerToQuaternion(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType == "Euler" and target.dataType == "Quaternion"
     def insert(self, nodeTree, origin, target, dataOrigin):
-        node = insertLinkedNode(nodeTree, "an_ConvertQuaternionAndEulerNode", origin, target)
+        node = insertLinkedNode(nodeTree, "an_ConvertRotationsNode", origin, target)
         node.conversionType = "EULER_TO_QUATERNION"
         node.inputs[0].linkWith(origin)
         node.outputs[0].linkWith(target)
@@ -82,7 +82,7 @@ class ConvertQuaternionToEuler(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType == "Quaternion" and target.dataType == "Euler"
     def insert(self, nodeTree, origin, target, dataOrigin):
-        node = insertLinkedNode(nodeTree, "an_ConvertQuaternionAndEulerNode", origin, target)
+        node = insertLinkedNode(nodeTree, "an_ConvertRotationsNode", origin, target)
         node.conversionType = "QUATERNION_TO_EULER"
         node.inputs[0].linkWith(origin)
         node.outputs[0].linkWith(target)
@@ -217,6 +217,12 @@ class ConvertBooleanToInteger(LinkCorrection):
     def insert(self, nodeTree, origin, target, dataOrigin):
         node = insertLinkedNode(nodeTree, "an_BooleanToIntegerNode", origin, target)
 
+class ConvertFromGenericList(LinkCorrection):
+    def check(self, origin, target):
+        return origin.dataType == "Generic List" and isList(target.dataType)
+    def insert(self, nodeTree, origin, target, dataOrigin):
+        node = insertLinkedNode(nodeTree, "an_ConvertNode", origin, target)
+
 class ConvertFromGeneric(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType == "Generic"
@@ -280,4 +286,5 @@ linkCorrectors = [
     ConverFloatToInteger(),
     ConvertToString(),
     ConvertBooleanToInteger(),
+    ConvertFromGenericList(),
     ConvertFromGeneric() ]

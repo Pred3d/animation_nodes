@@ -7,7 +7,7 @@ from collections import defaultdict
 from bpy.app.handlers import persistent
 from .. ui.node_colors import colorNetworks
 from .. utils.nodes import getAnimationNodeTrees
-from .. utils.blender_ui import convertToRegionLocation
+from .. utils.blender_ui import convertToRegionLocation, getDpiFactor
 from .. operators.dynamic_operators import getInvokeFunctionOperator
 from .. tree_info import getNetworkWithNode, getDirectlyLinkedSockets, getOriginNodes
 
@@ -120,7 +120,7 @@ class AnimationNode:
     def draw_label(self):
         return self.drawLabel()
 
-    def invokeFunction(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True, data = None):
+    def invokeFunction(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True, confirm = False, data = None):
         idName = getInvokeFunctionOperator(description)
         props = layout.operator(idName, text = text, icon = icon, emboss = emboss)
         props.classType = "NODE"
@@ -128,6 +128,7 @@ class AnimationNode:
         props.nodeName = self.name
         props.functionName = functionName
         props.invokeWithData = data is not None
+        props.confirm = confirm
         props.data = str(data)
 
     def invokeSocketTypeChooser(self, layout, functionName, socketGroup = "ALL", text = "", icon = "NONE", description = "", emboss = True):
@@ -381,12 +382,14 @@ def getViewLocation(node):
 def getRegionBottomLeft(node, region):
     location = node.viewLocation
     dimensions = node.dimensions
-    return convertToRegionLocation(region, location.x, location.y - dimensions.y)
+    dpiFactor = getDpiFactor()
+    return convertToRegionLocation(region, location.x, location.y - dimensions.y / dpiFactor)
 
 def getRegionBottomRight(node, region):
     location = node.viewLocation
     dimensions = node.dimensions
-    return convertToRegionLocation(region, location.x + dimensions.x, location.y - dimensions.y)
+    dpiFactor = getDpiFactor()
+    return convertToRegionLocation(region, location.x + dimensions.x / dpiFactor, location.y - dimensions.y / dpiFactor)
 
 def registerHandlers():
     bpy.types.Node.toID = nodeToID

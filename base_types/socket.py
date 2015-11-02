@@ -130,7 +130,7 @@ class AnimationNodeSocket:
     def getProperty(self):
         return
 
-    def invokeFunction(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True, data = None):
+    def invokeFunction(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True, confirm = False, data = None):
         idName = getInvokeFunctionOperator(description)
         props = layout.operator(idName, text = text, icon = icon, emboss = emboss)
         props.classType = "SOCKET"
@@ -140,6 +140,7 @@ class AnimationNodeSocket:
         props.identifier = self.identifier
         props.functionName = functionName
         props.invokeWithData = data is not None
+        props.confirm = confirm
         props.data = str(data)
 
     def invokeNodeInsertion(self, layout, nodeIdName, toIndex, text, settings = {}):
@@ -191,6 +192,7 @@ class AnimationNodeSocket:
         else: return self.nodeTree.links.new(self, socket)
 
     def removeLinks(self):
+        if not self.is_linked: return
         tree = self.nodeTree
         for link in self.links:
             tree.links.remove(link)
@@ -199,6 +201,11 @@ class AnimationNodeSocket:
         self.display.textInput = False
         self.display.moveOperators = False
         self.display.removeOperator = False
+
+    def isOnlyLinkedToDataType(self, dataType):
+        targets = self.dataTargets
+        if len(targets) == 0: return False
+        return all([target.dataType == dataType for target in targets])
 
 
     @property

@@ -21,13 +21,13 @@ Created by Jacques Lucke
 
 bl_info = {
     "name":        "Animation Nodes",
-    "description": "Node system for more flexible animations.",
+    "description": "Node based visual scripting system designed for motion graphics in Blender.",
     "author":      "Jacques Lucke",
-    "version":     (0, 1, 0),
+    "version":     (1, 0, 1),
     "blender":     (2, 7, 6),
     "location":    "Node Editor",
     "category":    "Node",
-    "warning":     "Stable, but some things may change in the future."
+    "warning":     ""
     }
 
 
