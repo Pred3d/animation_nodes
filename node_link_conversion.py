@@ -159,6 +159,16 @@ class ConvertSeparatedMeshDataToBMesh(LinkCorrection):
         nodeTree.links.new(toMesh.inputs[0], toMeshData.outputs[0])
         nodeTree.links.new(toMesh.outputs[0], target)
 
+class ConvertObjectToMeshData(LinkCorrection):
+    def check(self, origin, target):
+        return origin.dataType == "Object" and target.dataType == "Mesh Data"
+    def insert(self, nodeTree, origin, target, dataOrigin):
+        objectMeshData, toMeshData = insertNodes(nodeTree, ["an_ObjectMeshDataNode", "an_CombineMeshDataNode"], origin, target)
+        origin.linkWith(objectMeshData.inputs[0])
+        for i in range(3):
+            objectMeshData.outputs[i].linkWith(toMeshData.inputs[i])
+        toMeshData.outputs[0].linkWith(target)
+
 class ConvertNumberToVector(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType in ["Integer", "Float"] and target.dataType == "Vector"
@@ -261,6 +271,7 @@ linkCorrectors = [
     ConvertPolygonListIndicesToEdgeListIndices(),
     ConvertIntegerListToPolygonIndices(),
     ConvertSeparatedMeshDataToBMesh(),
+    ConvertObjectToMeshData(),
     ConvertNumberToVector(),
     ConvertVectorToNumber(),
     ConvertTextBlockToString(),
